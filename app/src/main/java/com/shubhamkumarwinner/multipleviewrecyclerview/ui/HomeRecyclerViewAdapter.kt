@@ -9,7 +9,7 @@ import com.shubhamkumarwinner.multipleviewrecyclerview.databinding.ItemDirectorB
 import com.shubhamkumarwinner.multipleviewrecyclerview.databinding.ItemMovieBinding
 import com.shubhamkumarwinner.multipleviewrecyclerview.databinding.ItemTitleBinding
 
-class HomeRecyclerViewAdapter: ListAdapter<HomeRecyclerViewItem, HomeRecyclerViewHolder>(REPO_COMPARATOR) {
+class HomeRecyclerViewAdapter(val onClickListener: OnClickListener): ListAdapter<HomeRecyclerViewItem, HomeRecyclerViewHolder>(REPO_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeRecyclerViewHolder {
         return when(viewType){
@@ -29,6 +29,10 @@ class HomeRecyclerViewAdapter: ListAdapter<HomeRecyclerViewItem, HomeRecyclerVie
             is HomeRecyclerViewHolder.DirectorViewHolder -> holder.bind(item as HomeRecyclerViewItem.Director)
             is HomeRecyclerViewHolder.MovieViewHolder -> holder.bind(item as HomeRecyclerViewItem.Movie)
             is HomeRecyclerViewHolder.TitleViewHolder -> holder.bind(item as HomeRecyclerViewItem.Title)
+        }
+
+        holder.itemView.setOnClickListener {
+            onClickListener.onClick(item)
         }
     }
 
@@ -55,4 +59,8 @@ class HomeRecyclerViewAdapter: ListAdapter<HomeRecyclerViewItem, HomeRecyclerVie
                 oldItem == newItem
         }
     }
+}
+
+class OnClickListener(val clickListener: (homeRecyclerViewItem: HomeRecyclerViewItem) -> Unit) {
+    fun onClick(homeRecyclerViewItem: HomeRecyclerViewItem) = clickListener(homeRecyclerViewItem)
 }

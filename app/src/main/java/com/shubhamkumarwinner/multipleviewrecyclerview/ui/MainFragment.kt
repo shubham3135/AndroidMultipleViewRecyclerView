@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.google.android.material.snackbar.Snackbar
 import com.shubhamkumarwinner.multipleviewrecyclerview.data.network.Resource
 import com.shubhamkumarwinner.multipleviewrecyclerview.databinding.MainFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,21 +17,29 @@ class MainFragment : Fragment() {
 
     private lateinit var binding: MainFragmentBinding
     private val viewModel by viewModels<MainViewModel>()
-    private val homeRecyclerViewAdapter = HomeRecyclerViewAdapter()
+    private lateinit var homeRecyclerViewAdapter : HomeRecyclerViewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = MainFragmentBinding.inflate(layoutInflater)
+        homeRecyclerViewAdapter = HomeRecyclerViewAdapter(OnClickListener{
+            val msg = when(it){
+                is HomeRecyclerViewItem.Director -> "Director ${it.name}"
+                is HomeRecyclerViewItem.Movie -> "Movie ${it.title}"
+                is HomeRecyclerViewItem.Title -> "View All Clicked"
+            }
+            requireActivity().snackbar(msg)
+        })
 
         viewModel.homeListItemsLiveData.observe(viewLifecycleOwner, Observer { result ->
             when(result){
                 is Resource.Failure -> binding.progressBar.hide()
                 Resource.Loading -> binding.progressBar.show()
                 is Resource.Success -> {
-                    binding.progressBar.hide()
                     binding.recyclerView.adapter = homeRecyclerViewAdapter
+                    binding.progressBar.hide()
                     homeRecyclerViewAdapter.submitList(result.value)
                 }
             }
